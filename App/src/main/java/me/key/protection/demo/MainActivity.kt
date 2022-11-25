@@ -58,27 +58,38 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
+        AESUtil.main();
+
     }
 
 
+    //加密数据
     private fun encryptWithKeyStore(plainText: String): String {
         encryptedPairData = getEncryptedDataPair(plainText)
         return encryptedPairData.second.toString(Charsets.UTF_8)
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
+
     private fun getKeyGenerator() {
         val keyGenerator =
-            KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
-        val keyGeneratorSpec = KeyGenParameterSpec.Builder(
-            "myKey",
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-        )
-            .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-            .setUserAuthenticationRequired(false)
-            .build()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
+            } else {
+                TODO("VERSION.SDK_INT < M")
+            }
+        val keyGeneratorSpec = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            KeyGenParameterSpec.Builder(
+                "keyTest",
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                .setUserAuthenticationRequired(false)
+                .build()
+        } else {
+            TODO("VERSION.SDK_INT < M")
+        }
         keyGenerator.init(keyGeneratorSpec)
         keyGenerator.generateKey()
     }
@@ -87,7 +98,7 @@ class MainActivity : AppCompatActivity() {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
         val secreteKeyEntry: KeyStore.SecretKeyEntry =
-            keyStore.getEntry("myKey", null) as KeyStore.SecretKeyEntry
+            keyStore.getEntry("keyTest", null) as KeyStore.SecretKeyEntry
         return secreteKeyEntry.secretKey
     }
 
@@ -100,6 +111,7 @@ class MainActivity : AppCompatActivity() {
         return Pair(_iv, encryptedData)
     }
 
+    //解密数据
     private fun decryptData(iv: ByteArray, encData: ByteArray): String {
         val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
         val keySpec = IvParameterSpec(iv)
