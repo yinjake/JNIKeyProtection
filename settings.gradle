@@ -1,1 +1,2 @@
-include ':App', ':JNIKey'
+include ':App'
+//, ':JNIKey'

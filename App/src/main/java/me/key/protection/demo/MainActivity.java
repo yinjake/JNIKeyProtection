@@ -23,18 +23,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         TextView value = findViewById(R.id.value);
-
+        Log.e("MainActivity", "  ---  "+"onCreate");
         try {
-            Context context = this.createPackageContext("me.decrypt.key", CONTEXT_INCLUDE_CODE | CONTEXT_IGNORE_SECURITY);
-
-            Log.e("MainActivity", JNISignature.getSignature(getApplicationContext()));
+          //  Context context = this.createPackageContext("me.decrypt.key", CONTEXT_INCLUDE_CODE | CONTEXT_IGNORE_SECURITY);
+          //  Log.e("MainActivity", "  ---  "+context);
+            Log.e("MainActivity1", "  ---  "+JNISignature.getSignature(getApplicationContext()));
             boolean flag = JNIKey.init();
-            Log.e("MainActivity", String.valueOf(flag));
+            Log.e("MainActivity2", "  ---  "+String.valueOf(flag));
             String key = JNIKey.getKey();
-            Log.e("MainActivity", key);
+            Log.e("MainActivity3", "  ---  "+key);
 
             value.setText(String.format("%s%s", flag, key));
-        } catch (PackageManager.NameNotFoundException e) {
+//        } catch (PackageManager.NameNotFoundException e) {
+//            e.printStackTrace();
+//        }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
